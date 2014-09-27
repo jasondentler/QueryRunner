@@ -1,0 +1,121 @@
+﻿<Window x:Class="DB2Query.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding Path=WindowTitle}">
+    <Window.Resources >
+        <ResourceDictionary Source="Images.xaml"/>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="Close" CanExecute="CloseCommandBinding_OnCanExecute" Executed="CloseCommandBinding_OnExecuted" />
+        <CommandBinding Command="New" Executed="NewCommandBinding_OnExecuted"/>
+        <CommandBinding Command="Open" Executed="OpenCommandBinding_OnExecuted"/>
+        <CommandBinding Command="Save" Executed="SaveCommandBinding_OnExecuted"/>
+        <CommandBinding Command="SaveAs" Executed="SaveAsCommandBinding_OnExecuted"/>
+        <CommandBinding Command="Print" Executed="PrintCommandBinding_OnExecuted" />
+        <CommandBinding Command="Undo" CanExecute="UndoCommandBinding_OnCanExecute" Executed="UndoCommandBinding_OnExecuted" />
+        <CommandBinding Command="Redo" CanExecute="RedoCommandBinding_OnCanExecute" Executed="RedoCommandBinding_OnExecuted" />
+        <CommandBinding Command="Cut" Executed="CutCommandBinding_OnExecuted"/>
+        <CommandBinding Command="Copy" Executed="CopyCommandBinding_OnExecuted"/>
+        <CommandBinding Command="Paste" CanExecute="PasteCommandBinding_OnCanExecute" Executed="PasteCommandBinding_OnExecuted"/>
+        <CommandBinding Command="Delete" CanExecute="DeleteCommandBinding_OnCanExecute" Executed="DeleteCommandBinding_OnExecuted"/>
+        <CommandBinding Command="Find" Executed="FindCommandBinding_OnExecuted"/>
+        <CommandBinding Command="Replace" Executed="ReplaceCommandBinding_OnExecuted"/>
+        <CommandBinding Command="SelectAll" Executed="SelectAllCommandBinding_OnExecuted"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Alt" Key="F4" Command="Close"/>
+    </Window.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition />
+            <RowDefinition Height="5"/>
+            <RowDefinition />
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="File">
+                <MenuItem Header="New" Command="New">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource NewImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Open" Command="Open">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource OpenImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save" Command="Save">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource SaveImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save As" Command="SaveAs">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource SaveAsImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Print" Command="Print">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource PrintImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Exit" Command="Close" InputGestureText="Alt+F4"/>
+            </MenuItem>
+            <MenuItem Header="Edit" >
+                <MenuItem Header="Undo" Command="Undo">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource UndoImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Redo" Command="Redo">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource RedoImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Cut" Command="Cut">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource CutImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Copy" Command="Copy" >
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource CopyImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Paste" Command="Paste">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource PasteImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Delete" Command="Delete"/>
+                <Separator/>
+                <MenuItem Header="Find" Command="Find">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource FindImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Replace" Command="Replace"/>
+                <Separator/>
+                <MenuItem Header="Select All" Command="SelectAll">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource SelectImage}"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>        
+        <TextBox Name="SqlText"  Grid.Row="1" 
+                 Text="{Binding Path=SqlText, UpdateSourceTrigger=PropertyChanged}" 
+                 TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" />
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" />
+        <Frame Grid.Row="3"/>
+        <StatusBar Grid.Row="4">
+            <StatusBarItem>
+                <Image Source="{StaticResource SaveImage}" Visibility="{Binding Path=HasChangesVisibility,Mode=OneWay}" ToolTip="Unsaved Changes" />
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
