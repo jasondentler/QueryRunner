@@ -30,7 +30,8 @@
     </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition />
             <RowDefinition Height="5"/>
             <RowDefinition />
@@ -127,13 +128,65 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-        </Menu>        
-        <TextBox Name="SqlText"  Grid.Row="1" 
+        </Menu>
+        <ToolBarTray Grid.Row="1">
+            <ToolBar Band="1" BandIndex="1">
+                <Button Command="New" ToolTip="New">
+                    <Image Source="{StaticResource NewImage}"/>
+                </Button>
+                <Button Command="Open" ToolTip="Open">
+                    <Image Source="{StaticResource OpenImage}"/>
+                </Button>
+                <Button Command="Save" ToolTip="Save">
+                    <Image Source="{StaticResource SaveImage}"/>
+                </Button>
+                <Button Command="Print" ToolTip="Print">
+                    <Image Source="{StaticResource PrintImage}"/>
+                </Button>
+            </ToolBar>
+            <ToolBar Band="1" BandIndex="2">
+                <Button Command="Undo" ToolTip="Undo">
+                    <Image Source="{StaticResource UndoImage}"/>
+                </Button>
+                <Button Command="Redo" ToolTip="Redo">
+                    <Image Source="{StaticResource RedoImage}"/>
+                </Button>
+                <Separator/>
+                <Button Command="Cut" ToolTip="Cut">
+                    <Image Source="{StaticResource CutImage}"/>
+                </Button>
+                <Button Command="Copy" ToolTip="Copy">
+                    <Image Source="{StaticResource CopyImage}"/>
+                </Button>
+                <Button Command="Paste" ToolTip="Paste">
+                    <Image Source="{StaticResource PasteImage}"/>
+                </Button>
+                <Separator/>
+                <Button Command="SelectAll" ToolTip="Select All">
+                    <Image Source="{StaticResource SelectImage}"/>
+                </Button>
+            </ToolBar>
+            <ToolBar Band="1" BandIndex="3">
+                <Button Command="queryRunner:CustomCommands.OpenConnection" ToolTip="Open Connection">
+                    <Canvas Height="16" Width="16">
+                        <Image Source="{StaticResource Database}"/>
+                        <Image Source="{StaticResource Connected}"/>
+                    </Canvas>
+                </Button>
+                <Button Command="queryRunner:CustomCommands.CloseConnection" ToolTip="Close Connection">
+                    <Canvas Height="16" Width="16">
+                        <Image Source="{StaticResource Database}"/>
+                        <Image Source="{StaticResource NotConnected}"/>
+                    </Canvas>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <TextBox Name="SqlText"  Grid.Row="2" 
                  Text="{Binding Path=SqlText, UpdateSourceTrigger=PropertyChanged}" 
                  TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" />
-        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" />
-        <Frame Grid.Row="3"/>
-        <StatusBar Grid.Row="4">
+        <GridSplitter Grid.Row="3" HorizontalAlignment="Stretch" />
+        <Frame Grid.Row="4"/>
+        <StatusBar Grid.Row="5">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">
                     <Canvas Height="16px" ToolTip="{Binding Path=ConnectionStateString}">

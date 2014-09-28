@@ -63,7 +63,7 @@ namespace QueryRunner
 
         private void UndoCommandBinding_OnCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = SqlText.CanUndo;
+            e.CanExecute = SqlText != null && SqlText.CanUndo;
         }
 
         private void UndoCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -72,7 +72,7 @@ namespace QueryRunner
 
         private void RedoCommandBinding_OnCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = SqlText.CanRedo;
+            e.CanExecute = SqlText != null && SqlText.CanRedo;
         }
 
         private void RedoCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -112,7 +112,7 @@ namespace QueryRunner
 
         private void DeleteCommandBinding_OnCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = SqlText.SelectionLength > 0;
+            e.CanExecute = SqlText != null && SqlText.SelectionLength > 0;
         }
 
         private void DeleteCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)

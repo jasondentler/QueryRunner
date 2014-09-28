@@ -151,6 +151,12 @@ namespace QueryRunner
 
         public void OpenConnection(ref bool cancel)
         {
+            cancel = false;
+            if (_connection != null)
+                PromptToCloseOpenConnection(ref cancel);
+
+            if (cancel) return;
+
             var dlg = new ConnectionSetup();
             dlg.Owner = _mainWindow;
             dlg.WindowStyle = WindowStyle.ToolWindow;
@@ -173,6 +179,15 @@ namespace QueryRunner
             {
                 cancel = true;
             }
+        }
+
+        private void PromptToCloseOpenConnection(ref bool cancel)
+        {
+            var result = MessageBox.Show(_mainWindow, "Do you want to close your existing connection?", "Existing Connection",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            cancel = result == MessageBoxResult.No;
+            if (result == MessageBoxResult.Yes)
+                CloseConnection();
         }
 
         public void CloseConnection()
