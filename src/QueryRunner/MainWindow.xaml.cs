@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -101,10 +102,12 @@ namespace QueryRunner
 
         private void FindCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
+            throw new NotImplementedException();
         }
 
         private void ReplaceCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
+            throw new NotImplementedException();
         }
 
         private void DeleteCommandBinding_OnCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -119,7 +122,19 @@ namespace QueryRunner
 
         private void OpenConnectionCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            _controller.OpenConnection();
+            var cancel = false;
+            _controller.OpenConnection(ref cancel);
         }
+
+        private void CloseConnectionCommandBinding_OnCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = _controller.ViewModel.IsConnected;
+        }
+
+        private void CloseConnectionCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            _controller.CloseConnection();
+        }
+
     }
 }

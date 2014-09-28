@@ -10,5 +10,10 @@ namespace QueryRunner
             "OpenConnection",
             typeof(CustomCommands)
             );
+
+        public static readonly RoutedUICommand CloseConnection = new RoutedUICommand(
+            "Close Connection",
+            "CloseConnection",
+            typeof (CustomCommands));
     }
 }

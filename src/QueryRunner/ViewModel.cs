@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -97,6 +98,29 @@ namespace QueryRunner
                 _connectionState = value;
                 OnPropertyChanged();
                 OnPropertyChanged("ConnectionStateOverlayImage");
+                OnPropertyChanged("IsConnected");
+                OnPropertyChanged("ConnectionStateString");
+            }
+        }
+
+        public string ConnectionStateString
+        {
+            get { return ConnectionState.ToString(); }
+        }
+
+        public bool IsConnected
+        {
+            get
+            {
+                switch (ConnectionState)
+                {
+                    case ConnectionState.Open:
+                    case ConnectionState.Fetching:
+                    case ConnectionState.Executing:
+                        return true;
+                    default:
+                        return false;
+                }
             }
         }
 
@@ -146,6 +170,7 @@ namespace QueryRunner
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
+            Debug.WriteLine("{0}.{1} changed.", new object[] { this.GetType().Name, propertyName });
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }

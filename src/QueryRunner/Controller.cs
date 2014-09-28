@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -9,10 +10,14 @@ using QueryRunner.Annotations;
 
 namespace QueryRunner
 {
-    public class Controller
+    public class Controller : IDisposable
     {
         private readonly ViewModel _viewModel;
         private readonly MainWindow _mainWindow;
+        private string _invariantName;
+        private string _connectionString;
+        private DbProviderFactory _factory;
+        private DbConnection _connection;
 
         public Controller([NotNull] MainWindow mainWindow)
         {
@@ -22,13 +27,18 @@ namespace QueryRunner
             _mainWindow.DataContext = _viewModel;
         }
 
+        public ViewModel ViewModel { get { return _viewModel; } }
+
         public void Close()
         {
             var cancel = false;
             if (_viewModel.HasChanges)
                 PromptToHandleUnsavedChanges(ref cancel);
             if (!cancel)
+            {
+                Dispose();
                 Application.Current.Shutdown();
+            }
         }
 
         public void Save(ref bool cancel)
@@ -139,11 +149,60 @@ namespace QueryRunner
             _viewModel.HasChanges = false;
         }
 
-        public void OpenConnection()
+        public void OpenConnection(ref bool cancel)
         {
-            _viewModel.ConnectionState = _viewModel.ConnectionState == ConnectionState.Open
-                ? ConnectionState.Closed
-                : ConnectionState.Open;
+            var dlg = new ConnectionSetup();
+            dlg.Owner = _mainWindow;
+            dlg.WindowStyle = WindowStyle.ToolWindow;
+            dlg.ShowInTaskbar = false;
+
+            if (!string.IsNullOrWhiteSpace(_invariantName))
+                dlg.Provider.SelectedValue = _invariantName;
+            if (!string.IsNullOrWhiteSpace(_connectionString))
+                dlg.ConnectionString.Text = _connectionString;
+
+            var result = dlg.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                cancel = false;
+                var provider = dlg.Provider.SelectedValue.ToString();
+                var connectionString = dlg.ConnectionString.Text;
+                OpenConnection(provider, connectionString);
+            }
+            else
+            {
+                cancel = true;
+            }
+        }
+
+        public void CloseConnection()
+        {
+            _factory = null;
+            if (_connection != null)
+                _connection.Dispose();
+            _connection = null;
+            _viewModel.ConnectionState = ConnectionState.Closed;
+        }
+
+        private void OpenConnection(string providerInvariant, string connectionString)
+        {
+            GetFactory(providerInvariant);
+            _connectionString = connectionString;
+            _connection = _factory.CreateConnection();
+            _connection.ConnectionString = connectionString;
+            _connection.StateChange += (sender, args) => _viewModel.ConnectionState = args.CurrentState;
+            _connection.Open();
+        }
+
+        private void GetFactory(string providerInvariant)
+        {
+            _invariantName = providerInvariant;
+            _factory = DbProviderFactories.GetFactory(providerInvariant);
+        }
+
+        public void Dispose()
+        {
+            CloseConnection();
         }
     }
 }

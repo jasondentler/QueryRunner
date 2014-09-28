@@ -23,6 +23,7 @@
         <CommandBinding Command="Replace" Executed="ReplaceCommandBinding_OnExecuted"/>
         <CommandBinding Command="SelectAll" Executed="SelectAllCommandBinding_OnExecuted"/>
         <CommandBinding Command="queryRunner:CustomCommands.OpenConnection" Executed="OpenConnectionCommandBinding_OnExecuted"/>
+        <CommandBinding Command="queryRunner:CustomCommands.CloseConnection" CanExecute="CloseConnectionCommandBinding_OnCanExecute" Executed="CloseConnectionCommandBinding_OnExecuted"/>
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Modifiers="Alt" Key="F4" Command="Close"/>
@@ -109,7 +110,22 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="Connection">
-                <MenuItem Header="Open" Command="queryRunner:CustomCommands.OpenConnection" />
+                <MenuItem Header="Connect" Command="queryRunner:CustomCommands.OpenConnection" >
+                    <MenuItem.Icon>
+                        <Canvas Width="16px" Height="16px">
+                            <Image Source="{StaticResource Database}" />
+                            <Image Source="{StaticResource Connected}"/>
+                        </Canvas>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Disconnect" Command="queryRunner:CustomCommands.CloseConnection" >
+                    <MenuItem.Icon>
+                        <Canvas Width="16px" Height="16px">
+                            <Image Source="{StaticResource Database}" />
+                            <Image Source="{StaticResource NotConnected}"/>
+                        </Canvas>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>        
         <TextBox Name="SqlText"  Grid.Row="1" 
@@ -119,13 +135,14 @@
         <Frame Grid.Row="3"/>
         <StatusBar Grid.Row="4">
             <StatusBarItem>
-                <Canvas Width="16px" Height="16px">
-                    <Image Source="{StaticResource Database}" />
-                    <Image Source="{Binding Path=ConnectionStateOverlayImage}"/>
-                </Canvas>
-            </StatusBarItem>
-            <StatusBarItem>
-                <Image Source="{StaticResource SaveImage}" Visibility="{Binding Path=HasChangesVisibility,Mode=OneWay}" ToolTip="Unsaved Changes" />
+                <StackPanel Orientation="Horizontal">
+                    <Canvas Height="16px" ToolTip="{Binding Path=ConnectionStateString}">
+                        <Image Source="{StaticResource Database}" />
+                        <Image Source="{Binding Path=ConnectionStateOverlayImage}"/>
+                    </Canvas>
+                    <TextBlock Text="{Binding Path=ConnectionStateString}" Margin="20,0,10,0"/>
+                    <Image Source="{StaticResource SaveImage}" Visibility="{Binding Path=HasChangesVisibility,Mode=OneWay}" ToolTip="Unsaved Changes" />
+                </StackPanel>
             </StatusBarItem>
         </StatusBar>
     </Grid>

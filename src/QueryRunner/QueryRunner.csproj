@@ -55,12 +55,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ConnectionSetup.xaml.cs">
+      <DependentUpon>ConnectionSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ConnectionSetupViewModel.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="CustomCommands.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="WindowExtensions.cs" />
+    <Page Include="ConnectionSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Images.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
