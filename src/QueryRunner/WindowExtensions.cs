@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Windows;
 
-namespace DB2Query
+namespace QueryRunner
 {
     public static class WindowExtensions
     {

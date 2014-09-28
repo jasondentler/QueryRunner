@@ -1,4 +1,4 @@
-namespace DB2Query
+namespace QueryRunner
 {
     public static class StringExtensions
     {

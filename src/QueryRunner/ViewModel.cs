@@ -3,16 +3,19 @@ using System.Data;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
-using DB2Query.Annotations;
+using QueryRunner.Annotations;
 
-namespace DB2Query
+namespace QueryRunner
 {
     public class ViewModel : INotifyPropertyChanged
     {
+        private readonly MainWindow _mainWindow;
 
-        public ViewModel()
+        public ViewModel(MainWindow mainWindow)
         {
+            _mainWindow = mainWindow;
             RecalculateSqlTextHash(true);
         }
 
@@ -93,6 +96,23 @@ namespace DB2Query
                 if (value == _connectionState) return;
                 _connectionState = value;
                 OnPropertyChanged();
+                OnPropertyChanged("ConnectionStateOverlayImage");
+            }
+        }
+
+        public ImageSource ConnectionStateOverlayImage
+        {
+            get
+            {
+                switch (ConnectionState)
+                {
+                    case ConnectionState.Open:
+                    case ConnectionState.Fetching:
+                    case ConnectionState.Executing:
+                        return (ImageSource) _mainWindow.Resources["Connected"];
+                    default:
+                        return (ImageSource)_mainWindow.Resources["NotConnected"];
+                }
             }
         }
 

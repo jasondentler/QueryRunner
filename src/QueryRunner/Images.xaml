@@ -12,4 +12,8 @@
     <BitmapImage x:Key="PasteImage" UriSource="Images/Paste_6520.png"/>
     <BitmapImage x:Key="FindImage" UriSource="Images/Find_5650.png"/>
     <BitmapImage x:Key="SelectImage" UriSource="Images/Select.png"/>
+
+    <BitmapImage x:Key="Database" UriSource="Images/DatabaseProject_7342_16x.png"/>
+    <BitmapImage x:Key="NotConnected" UriSource="Images/DataConnection-NotConnected_1059.png"/>
+    <BitmapImage x:Key="Connected" UriSource="Images/DataConnection-Connected_1061.png"/>
 </ResourceDictionary>

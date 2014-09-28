@@ -1,29 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Packaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Media;
-using System.Windows.Xps;
-using System.Windows.Xps.Packaging;
+using QueryRunner.Annotations;
 
-namespace DB2Query
+namespace QueryRunner
 {
     public class Controller
     {
-        private ViewModel _viewModel;
+        private readonly ViewModel _viewModel;
         private readonly MainWindow _mainWindow;
 
-        public Controller(MainWindow mainWindow)
+        public Controller([NotNull] MainWindow mainWindow)
         {
+            if (mainWindow == null) throw new ArgumentNullException("mainWindow");
             _mainWindow = mainWindow;
-            _viewModel = new ViewModel();
+            _viewModel = new ViewModel(mainWindow);
             _mainWindow.DataContext = _viewModel;
         }
 
@@ -142,6 +137,13 @@ namespace DB2Query
             _viewModel.SqlText = File.ReadAllText(dlg.FileName);
             _viewModel.CurrentFileName = dlg.FileName;
             _viewModel.HasChanges = false;
+        }
+
+        public void OpenConnection()
+        {
+            _viewModel.ConnectionState = _viewModel.ConnectionState == ConnectionState.Open
+                ? ConnectionState.Closed
+                : ConnectionState.Open;
         }
     }
 }

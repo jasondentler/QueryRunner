@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 
-namespace DB2Query
+namespace QueryRunner
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -117,5 +117,9 @@ namespace DB2Query
             SqlText.SelectedText = string.Empty;
         }
 
+        private void OpenConnectionCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            _controller.OpenConnection();
+        }
     }
 }
