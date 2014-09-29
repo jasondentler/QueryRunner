@@ -154,6 +154,9 @@
     <Resource Include="Images\DataConnection-Connected_1061.png" />
     <Resource Include="Images\DataConnection-NotConnected_1059.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Executequery_9958.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

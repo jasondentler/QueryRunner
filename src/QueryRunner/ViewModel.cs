@@ -1,8 +1,10 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -17,6 +19,7 @@ namespace QueryRunner
         public ViewModel(MainWindow mainWindow)
         {
             _mainWindow = mainWindow;
+            _messages = new List<string>();
             RecalculateSqlTextHash(true);
         }
 
@@ -25,8 +28,9 @@ namespace QueryRunner
         private string _loadedHash;
         private DispatcherOperation _recalculateOperation;
         private ConnectionState _connectionState;
-        private string _messages;
+        private List<string> _messages;
         private string _currentFileName;
+        private DataTable _results;
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Visibility HasChangesVisibility
@@ -60,8 +64,18 @@ namespace QueryRunner
                 if (value == _sqlText) return;
                 _sqlText = value;
                 OnPropertyChanged();
+                OnPropertyChanged("CanExecuteQuery");
                 if (_recalculateOperation != null) _recalculateOperation.Abort();
                 _recalculateOperation = Dispatcher.CurrentDispatcher.InvokeAsync(() => RecalculateSqlTextHash(), DispatcherPriority.Background);
+            }
+        }
+
+        public bool CanExecuteQuery
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(SqlText)
+                       && ConnectionState == ConnectionState.Open;
             }
         }
 
@@ -97,6 +111,7 @@ namespace QueryRunner
                 if (value == _connectionState) return;
                 _connectionState = value;
                 OnPropertyChanged();
+                OnPropertyChanged("CanExecuteQuery");
                 OnPropertyChanged("ConnectionStateOverlayImage");
                 OnPropertyChanged("IsConnected");
                 OnPropertyChanged("ConnectionStateString");
@@ -140,15 +155,22 @@ namespace QueryRunner
             }
         }
 
-        public string Messages
+        public IEnumerable<string> Messages
         {
-            get { return _messages; }
-            set
-            {
-                if (value == _messages) return;
-                _messages = value;
-                OnPropertyChanged();
-            }
+            get { return _messages.AsReadOnly(); }
+        }
+
+        public void AddMessage(string message)
+        {
+            Debug.WriteLine(message);
+            _messages.Add(message);
+            OnPropertyChanged("Messages");
+        }
+
+        public void ClearMessages()
+        {
+            _messages = new List<string>();
+            OnPropertyChanged("Messages");
         }
 
         private void RecalculateSqlTextHash(bool setLoadedHash = false)

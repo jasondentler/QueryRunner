@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using QueryRunner.Annotations;
 
@@ -196,6 +199,7 @@ namespace QueryRunner
             if (_connection != null)
                 _connection.Dispose();
             _connection = null;
+            _viewModel.ClearMessages();
             _viewModel.ConnectionState = ConnectionState.Closed;
         }
 
@@ -206,6 +210,13 @@ namespace QueryRunner
             _connection = _factory.CreateConnection();
             _connection.ConnectionString = connectionString;
             _connection.StateChange += (sender, args) => _viewModel.ConnectionState = args.CurrentState;
+
+            var sqlConn = _connection as SqlConnection;
+            if (sqlConn != null)
+            {
+                sqlConn.FireInfoMessageEventOnUserErrors = true;
+                sqlConn.InfoMessage += (sender, args) => _viewModel.AddMessage(args.Message);
+            }
             _connection.Open();
         }
 
@@ -215,9 +226,60 @@ namespace QueryRunner
             _factory = DbProviderFactories.GetFactory(providerInvariant);
         }
 
+        public void ExecuteQuery()
+        {
+            _viewModel.ClearMessages();
+            var sql = _viewModel.SqlText;
+            using (var cmd = _connection.CreateCommand())
+            {
+                cmd.CommandText = sql;
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandTimeout = 0;
+                try
+                {
+                    var ds = new DataSet();
+                    using (var da = _factory.CreateDataAdapter())
+                    {
+                        da.SelectCommand = cmd;
+                        da.Fill(ds);
+                    }
+
+                    var items = _mainWindow.ResultsContainer.Items;
+                    while (items.Count > 1)
+                        items.RemoveAt(1);
+
+                    foreach (var table in ds.Tables.Cast<DataTable>())
+                    {
+                        var tabItem = new TabItem();
+                        items.Add(tabItem);
+
+                        tabItem.DataContext = table;
+                        tabItem.Header = table.TableName;
+
+                        var grid = new DataGrid();
+                        tabItem.Content = grid;
+
+                        grid.AutoGenerateColumns = true;
+                        grid.IsReadOnly = true;
+                        grid.SetBinding(ItemsControl.ItemsSourceProperty, new Binding() {BindsDirectlyToSource = true});
+                    }
+
+                    _mainWindow.ResultsContainer.SelectedItem = items.Cast<TabItem>().Take(2).Last();
+
+                }
+                catch (DbException ex)
+                {
+                    var message = string.Format("Error {0} [HRESULT {1}] {2}", ex.Source, ex.ErrorCode, ex.Message);
+                    _viewModel.AddMessage(message);
+                }
+            }
+            
+        }
+
         public void Dispose()
         {
             CloseConnection();
         }
+
     }
 }

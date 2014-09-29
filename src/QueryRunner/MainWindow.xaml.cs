@@ -136,5 +136,29 @@ namespace QueryRunner
             _controller.CloseConnection();
         }
 
+        private void ExecuteQueryCommandBinding_OnCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = _controller.ViewModel.CanExecuteQuery;
+        }
+
+        private void ExecuteQueryCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            _controller.ExecuteQuery();
+        }
+
+        private void IncreaseFontSizeCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var currentValue = (double) Resources["DefaultFontSize"];
+            currentValue ++;
+            Resources["DefaultFontSize"] = currentValue;
+        }
+
+        private void DecreaseFontSizeCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var currentValue = (double)Resources["DefaultFontSize"];
+            currentValue--;
+            if (currentValue < 1) currentValue = 1;
+            Resources["DefaultFontSize"] = currentValue;
+        }
     }
 }

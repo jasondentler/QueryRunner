@@ -24,9 +24,15 @@
         <CommandBinding Command="SelectAll" Executed="SelectAllCommandBinding_OnExecuted"/>
         <CommandBinding Command="queryRunner:CustomCommands.OpenConnection" Executed="OpenConnectionCommandBinding_OnExecuted"/>
         <CommandBinding Command="queryRunner:CustomCommands.CloseConnection" CanExecute="CloseConnectionCommandBinding_OnCanExecute" Executed="CloseConnectionCommandBinding_OnExecuted"/>
+        <CommandBinding Command="queryRunner:CustomCommands.Execute" CanExecute="ExecuteQueryCommandBinding_OnCanExecute" Executed="ExecuteQueryCommandBinding_OnExecuted"/>
+        <CommandBinding Command="queryRunner:CustomCommands.IncreaseFontSize" Executed="IncreaseFontSizeCommandBinding_OnExecuted" />
+        <CommandBinding Command="queryRunner:CustomCommands.DecreaseFontSize" Executed="DecreaseFontSizeCommandBinding_OnExecuted" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Modifiers="Alt" Key="F4" Command="Close"/>
+        <KeyBinding Key="F5" Command="queryRunner:CustomCommands.Execute"/>
+        <KeyBinding Modifiers="Control" Key="OemPlus" Command="queryRunner:CustomCommands.IncreaseFontSize"/>
+        <KeyBinding Modifiers="Control" Key="OemMinus" Command="queryRunner:CustomCommands.DecreaseFontSize"/>
     </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -127,6 +133,11 @@
                         </Canvas>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Header="Execute Query" Command="queryRunner:CustomCommands.Execute" InputGestureText="F5" >
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource Execute}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
         <ToolBarTray Grid.Row="1">
@@ -179,13 +190,41 @@
                         <Image Source="{StaticResource NotConnected}"/>
                     </Canvas>
                 </Button>
+                <Button Command="queryRunner:CustomCommands.Execute" ToolTip="Execute Query">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{StaticResource Execute}"/>
+                        <TextBlock Text="Execute" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button>
             </ToolBar>
         </ToolBarTray>
         <TextBox Name="SqlText"  Grid.Row="2" 
                  Text="{Binding Path=SqlText, UpdateSourceTrigger=PropertyChanged}" 
-                 TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" />
+                 TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" 
+                 FontFamily="{DynamicResource DefaultFont}" FontSize="{DynamicResource DefaultFontSize}" />
         <GridSplitter Grid.Row="3" HorizontalAlignment="Stretch" />
-        <Frame Grid.Row="4"/>
+        <TabControl Grid.Row="4" Name="ResultsContainer">
+            <TabItem Header="Messages">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Path=Messages}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel></StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="system.String">
+                                <TextBlock 
+                                    Text="{Binding BindsDirectlyToSource=True}" 
+                                    TextWrapping="Wrap" 
+                                    FontFamily="{DynamicResource DefaultFont}" 
+                                    FontSize="{DynamicResource DefaultFontSize}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
         <StatusBar Grid.Row="5">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">

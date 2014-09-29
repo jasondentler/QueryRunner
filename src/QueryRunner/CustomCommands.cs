@@ -15,5 +15,20 @@ namespace QueryRunner
             "Close Connection",
             "CloseConnection",
             typeof (CustomCommands));
+
+        public static readonly RoutedUICommand Execute = new RoutedUICommand(
+            "Execute Query",
+            "ExecuteQuery",
+            typeof (CustomCommands));
+
+        public static readonly RoutedUICommand IncreaseFontSize = new RoutedUICommand(
+            "Increase Font Size",
+            "IncreaseFontSize",
+            typeof(CustomCommands));
+
+        public static readonly RoutedUICommand DecreaseFontSize = new RoutedUICommand(
+            "Decrease Font Size",
+            "DecreaseFontSize",
+            typeof(CustomCommands));
     }
 }
