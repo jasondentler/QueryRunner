@@ -261,7 +261,9 @@ namespace QueryRunner
 
                         grid.AutoGenerateColumns = true;
                         grid.IsReadOnly = true;
+
                         grid.SetBinding(ItemsControl.ItemsSourceProperty, new Binding() {BindsDirectlyToSource = true});
+                        grid.AutoGeneratingColumn += DataGrid_AutoGeneratingColumn;
                     }
 
                     _mainWindow.ResultsContainer.SelectedItem = items.Cast<TabItem>().Take(2).Last();
@@ -272,10 +274,14 @@ namespace QueryRunner
                     var message = string.Format("Error {0} [HRESULT {1}] {2}", ex.Source, ex.ErrorCode, ex.Message);
                     _viewModel.AddMessage(message);
                 }
-            }
-            
+            }            
         }
 
+        private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            ((DataGridBoundColumn)e.Column).Binding.TargetNullValue = "[NULL]";
+        }
+        
         public void Dispose()
         {
             CloseConnection();
