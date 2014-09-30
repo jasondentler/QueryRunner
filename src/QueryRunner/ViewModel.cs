@@ -75,7 +75,7 @@ namespace QueryRunner
             get
             {
                 return !string.IsNullOrWhiteSpace(SqlText)
-                       && ConnectionState == ConnectionState.Open;
+                       && (ConnectionState & ConnectionState.Open) != 0;
             }
         }
 

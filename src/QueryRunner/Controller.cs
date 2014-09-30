@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -226,57 +227,74 @@ namespace QueryRunner
             _factory = DbProviderFactories.GetFactory(providerInvariant);
         }
 
-        public void ExecuteQuery()
+        public async void ExecuteQuery()
         {
             _viewModel.ClearMessages();
             var sql = _viewModel.SqlText;
-            using (var cmd = _connection.CreateCommand())
+            try
             {
-                cmd.CommandText = sql;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandTimeout = 0;
+                var ds = await ExecuteQuery(sql);
+                RemoveResultTabs();
+
+                var items = _mainWindow.ResultsContainer.Items;
+
+                foreach (var table in ds.Tables.Cast<DataTable>())
+                {
+                    var tabItem = new TabItem();
+                    items.Add(tabItem);
+
+                    tabItem.DataContext = table;
+                    tabItem.Header = table.TableName;
+
+                    var grid = new DataGrid();
+                    tabItem.Content = grid;
+
+                    grid.AutoGenerateColumns = true;
+                    grid.IsReadOnly = true;
+
+                    grid.SetValue(DataGridBehavior.DisplayRowNumberProperty, true);
+                    grid.SetBinding(ItemsControl.ItemsSourceProperty, new Binding() {BindsDirectlyToSource = true});
+                    grid.AutoGeneratingColumn += DataGrid_AutoGeneratingColumn;
+                }
+
+                _mainWindow.ResultsContainer.SelectedItem = items.Cast<TabItem>().Take(2).Last();
+
+            }
+            catch (DbException ex)
+            {
+                RemoveResultTabs();
+                var message = string.Format("Error {0} [HRESULT {1}] {2}", ex.Source, ex.ErrorCode, ex.Message);
+                _viewModel.AddMessage(message);
+            }
+
+        }
+
+        private async Task<DataSet> ExecuteQuery(string sql)
+        {
+            return await Task.Run(() =>
+            {
                 try
                 {
-                    var ds = new DataSet();
-                    using (var da = _factory.CreateDataAdapter())
+                    using (var cmd = _connection.CreateCommand())
                     {
-                        da.SelectCommand = cmd;
-                        da.Fill(ds);
+                        cmd.CommandText = sql;
+                        cmd.CommandType = CommandType.Text;
+                        cmd.CommandTimeout = 0;
+                        var ds = new DataSet();
+                        using (var da = _factory.CreateDataAdapter())
+                        {
+                            da.SelectCommand = cmd;
+                            _viewModel.ConnectionState |= ConnectionState.Executing;
+                            da.Fill(ds);
+                        }
+                        return ds;
                     }
-
-                    RemoveResultTabs();
-
-                    var items = _mainWindow.ResultsContainer.Items;
-
-                    foreach (var table in ds.Tables.Cast<DataTable>())
-                    {
-                        var tabItem = new TabItem();
-                        items.Add(tabItem);
-
-                        tabItem.DataContext = table;
-                        tabItem.Header = table.TableName;
-
-                        var grid = new DataGrid();
-                        tabItem.Content = grid;
-
-                        grid.AutoGenerateColumns = true;
-                        grid.IsReadOnly = true;
-
-                        grid.SetValue(DataGridBehavior.DisplayRowNumberProperty, true);
-                        grid.SetBinding(ItemsControl.ItemsSourceProperty, new Binding() { BindsDirectlyToSource = true });
-                        grid.AutoGeneratingColumn += DataGrid_AutoGeneratingColumn;
-                    }
-
-                    _mainWindow.ResultsContainer.SelectedItem = items.Cast<TabItem>().Take(2).Last();
-
                 }
-                catch (DbException ex)
+                finally
                 {
-                    RemoveResultTabs();
-                    var message = string.Format("Error {0} [HRESULT {1}] {2}", ex.Source, ex.ErrorCode, ex.Message);
-                    _viewModel.AddMessage(message);
+                    _viewModel.ConnectionState &= (16*2 - 1 - (ConnectionState.Executing));
                 }
-            }            
+            });
         }
 
         private void RemoveResultTabs()
