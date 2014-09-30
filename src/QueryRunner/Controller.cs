@@ -244,9 +244,9 @@ namespace QueryRunner
                         da.Fill(ds);
                     }
 
+                    RemoveResultTabs();
+
                     var items = _mainWindow.ResultsContainer.Items;
-                    while (items.Count > 1)
-                        items.RemoveAt(1);
 
                     foreach (var table in ds.Tables.Cast<DataTable>())
                     {
@@ -262,7 +262,8 @@ namespace QueryRunner
                         grid.AutoGenerateColumns = true;
                         grid.IsReadOnly = true;
 
-                        grid.SetBinding(ItemsControl.ItemsSourceProperty, new Binding() {BindsDirectlyToSource = true});
+                        grid.SetValue(DataGridBehavior.DisplayRowNumberProperty, true);
+                        grid.SetBinding(ItemsControl.ItemsSourceProperty, new Binding() { BindsDirectlyToSource = true });
                         grid.AutoGeneratingColumn += DataGrid_AutoGeneratingColumn;
                     }
 
@@ -271,10 +272,18 @@ namespace QueryRunner
                 }
                 catch (DbException ex)
                 {
+                    RemoveResultTabs();
                     var message = string.Format("Error {0} [HRESULT {1}] {2}", ex.Source, ex.ErrorCode, ex.Message);
                     _viewModel.AddMessage(message);
                 }
             }            
+        }
+
+        private void RemoveResultTabs()
+        {
+            var items = _mainWindow.ResultsContainer.Items;
+            while (items.Count > 1)
+                items.RemoveAt(1);
         }
 
         private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
